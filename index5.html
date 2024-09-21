@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geo Tracking Page</title>
+</head>
+<body>
+    <h1>Welcome to my geo tracking page!</h1>
+    <p>Your visit is being tracked and an email will be sent with your device info and location.</p>
+
+    <script>
+        // Получаем данные о модели устройства
+        const userAgent = navigator.userAgent;
+
+        // Получаем геолокацию
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendData);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        // Отправляем данные на серверную функцию
+        function sendData(position) {
+            const data = {
+                userAgent: userAgent,
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            };
+
+            fetch('/.netlify/functions/sendEmail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Запуск получения данных о геолокации и устройстве при загрузке страницы
+        window.onload = function() {
+            getLocation();
+        };
+        
+    </script>
+</body>
+</html>
